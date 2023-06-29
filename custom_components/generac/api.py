@@ -1,0 +1,167 @@
+"""Sample API Client."""
+import json
+import logging
+
+import aiohttp
+from bs4 import BeautifulSoup
+from dacite import from_dict
+
+from .models import Apparatus
+from .models import ApparatusDetail
+from .models import SelfAssertedResponse
+from .models import SignInConfig
+
+API_BASE = "https://app.mobilelinkgen.com/api"
+LOGIN_BASE = "https://generacconnectivity.b2clogin.com/generacconnectivity.onmicrosoft.com/B2C_1A_MobileLink_SignIn"
+
+TIMEOUT = 10
+
+
+_LOGGER: logging.Logger = logging.getLogger(__package__)
+
+
+class InvalidCredentialsException(Exception):
+    pass
+
+
+class SessionExpiredException(Exception):
+    pass
+
+
+def get_setting_json(page: str):
+    for line in page.splitlines():
+        if line.startswith("var SETTINGS = ") and line.endswith(";"):
+            return json.loads(line.removeprefix("var SETTINGS = ").removesuffix(";"))
+
+
+class GeneracApiClient:
+    def __init__(
+        self, username: str, password: str, session: aiohttp.ClientSession
+    ) -> None:
+        """Sample API Client."""
+        self._username = username
+        self._passeword = password
+        self._session = session
+        self._logged_in = False
+        self.csrf = ""
+
+    async def async_get_data(self) -> dict:
+        """Get data from the API."""
+        try:
+            if not self._logged_in:
+                await self.login()
+                self._logged_in = True
+        except SessionExpiredException:
+            self._logged_in = False
+            return await self.async_get_data()
+        return await self.get_generator_data()
+
+    async def get_generator_data(self):
+        apparatuses = await self.get_endpoint("/v2/Apparatus/list")
+        if apparatuses is None:
+            _LOGGER.debug("Could not decode apparatuses response")
+            return None
+
+        data : dict[str, tuple[Apparatus, ApparatusDetail]] = {}
+        for apparatus in apparatuses:
+            apparatus = from_dict(Apparatus, apparatus)
+            if apparatus.type != 0:
+                _LOGGER.debug("Unknown apparatus type %s %s", apparatus.type, apparatus.name)
+                continue
+            detail_json = await self.get_endpoint(f"/v1/Apparatus/details/{apparatus.apparatusId}")
+            detail = from_dict(ApparatusDetail, detail_json)
+            data[str(apparatus.apparatusId)] = (apparatus, detail)
+        return data
+
+    async def get_endpoint(self, endpoint: str):
+        try:
+            response = await self._session.get(API_BASE + endpoint, headers={'X-Csrf-Token': self.csrf})
+            if response.status == 204:
+                # no data
+                return None
+
+            if response.status != 200:
+                raise SessionExpiredException("API returned status code: %s " % response.status)
+
+            data = await response.json()
+            _LOGGER.debug("getEndpoint %s", json.dumps(data))
+            return data
+        except SessionExpiredException:
+            raise
+        except Exception as ex:
+            raise IOError() from ex
+
+    async def login(self) -> None:
+        """Login to API"""
+        login_response = await (await self._session.get(f"{API_BASE}/Auth/SignIn?email={self._username}", allow_redirects=True)).text()
+
+        if await self.submit_form(login_response):
+            return
+
+        parse_settings = get_setting_json(login_response)
+        sign_in_config = from_dict(SignInConfig, parse_settings)
+
+        form_data = aiohttp.FormData()
+        form_data.add_field("request_type", "RESPONSE")
+        form_data.add_field("signInName", self._username)
+        form_data.add_field("password", self._passeword)
+        self.csrf = sign_in_config.csrf
+
+        self_asserted_response = await self._session.post(
+            f"{LOGIN_BASE}/SelfAsserted",
+            headers={'X-Csrf-Token': sign_in_config.csrf},
+            params={
+                "tx": "StateProperties=" + sign_in_config.transId,
+                "p": "B2C_1A_SignUpOrSigninOnline"
+            },
+            data=form_data)
+
+        if self_asserted_response.status != 200:
+            raise IOError(f"SelfAsserted: Bad response status: {self_asserted_response.status}")
+        satxt = await self_asserted_response.text()
+
+        sa = from_dict(SelfAssertedResponse, json.loads(satxt))
+
+        if sa.status != "200":
+            raise InvalidCredentialsException()
+
+        confirmed_response = await self._session.get(
+            f"{LOGIN_BASE}/api/CombinedSigninAndSignup/confirmed",
+            params={
+                "csrf_token": sign_in_config.csrf,
+                "tx": "StateProperties=" + sign_in_config.transId,
+                "p": "B2C_1A_SignUpOrSigninOnline"
+            })
+
+        if confirmed_response.status != 200:
+            raise IOError(f"CombinedSigninAndSignup: Bad response status: {confirmed_response.status}")
+
+        loginString = await confirmed_response.text()
+        if not await self.submit_form(loginString):
+            raise IOError("Error parsing HTML submit form")
+
+    async def submit_form(self, response: str) -> bool:
+        login_page = BeautifulSoup(response, features="html.parser")
+        form = login_page.select("form")
+        login_state = login_page.select("input[name=state]")
+        login_code = login_page.select("input[name=code]")
+
+        if len(form) == 0 or len(login_state) == 0 or len(login_code) == 0:
+            _LOGGER.info("Could not load login page")
+            return False
+
+        form = form[0]
+        login_state = login_state[0]
+        login_code = login_code[0]
+
+        action = form.attrs["action"]
+
+        form_data = aiohttp.FormData()
+        form_data.add_field("state", login_state.attrs["value"])
+        form_data.add_field("code", login_code.attrs["value"])
+
+        login_response = await self._session.post(action, data=form_data)
+
+        if login_response.status != 200:
+            raise IOError(f"Bad api login response: {login_response.status}")
+        return True
