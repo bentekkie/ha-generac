@@ -55,7 +55,7 @@ soupsieve==2.4.1
 text-unidecode==1.3
 tomli==2.0.1
 tomlkit==0.11.8
-typing_extensions==4.6.3
+typing_extensions==4.7.0
 ulid-transform==0.7.2
 urllib3==2.0.3
 voluptuous==0.13.1
