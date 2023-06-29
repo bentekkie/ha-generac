@@ -7,5 +7,6 @@
   "config_flow": true,
   "codeowners": ["@bentekkie"],
   "requirements": ["beautifulsoup4==4.12.2", "dacite==1.8.1"],
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "iot_class": "cloud_polling"
 }
