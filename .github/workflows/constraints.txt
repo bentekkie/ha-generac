@@ -5,3 +5,4 @@ flake8==3.8.4
 reorder-python-imports==2.3.6
 beautifulsoup4==4.12.2
 dacite==1.8.1
+pipreqs==0.4.13
