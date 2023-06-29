@@ -34,7 +34,7 @@ isort==5.12.0
 Jinja2==3.1.2
 jinja2-time==0.2.0
 lazy-object-proxy==1.9.0
-lru-dict==1.1.8
+lru-dict==1.2.0
 MarkupSafe==2.1.3
 mccabe==0.7.0
 multidict==6.0.4
