@@ -114,14 +114,17 @@ class Apparatus:
             deviceType: Optional[str]
             signalStrength: Optional[str]
             batteryLevel: Optional[str]
+
         value: Value
         type: int
+
     properties: list[Property]
 
 
 @dataclass
 class Address:
-    """ generated source for class Address """
+    """generated source for class Address"""
+
     line1: str
     line2: Optional[str]
     city: str
@@ -132,7 +135,8 @@ class Address:
 
 @dataclass
 class Subscription:
-    """ generated source for class Subscription """
+    """generated source for class Subscription"""
+
     type: int
     status: int
     isLegacy: bool
@@ -152,6 +156,7 @@ class ApparatusDetail:
         name: str
         value: str
         type: int
+
     apparatusId: int
     name: str
     serialNumber: str

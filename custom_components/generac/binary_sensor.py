@@ -13,7 +13,9 @@ from .coordinator import GeneracDataUpdateCoordinator
 from .entity import GeneracEntity
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+):
     """Setup binary_sensor platform."""
     coordinator: GeneracDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
     data = coordinator.data

@@ -63,26 +63,34 @@ class GeneracApiClient:
             _LOGGER.debug("Could not decode apparatuses response")
             return None
 
-        data : dict[str, Item] = {}
+        data: dict[str, Item] = {}
         for apparatus in apparatuses:
             apparatus = from_dict(Apparatus, apparatus)
             if apparatus.type != 0:
-                _LOGGER.debug("Unknown apparatus type %s %s", apparatus.type, apparatus.name)
+                _LOGGER.debug(
+                    "Unknown apparatus type %s %s", apparatus.type, apparatus.name
+                )
                 continue
-            detail_json = await self.get_endpoint(f"/v1/Apparatus/details/{apparatus.apparatusId}")
+            detail_json = await self.get_endpoint(
+                f"/v1/Apparatus/details/{apparatus.apparatusId}"
+            )
             detail = from_dict(ApparatusDetail, detail_json)
             data[str(apparatus.apparatusId)] = Item(apparatus, detail)
         return data
 
     async def get_endpoint(self, endpoint: str):
         try:
-            response = await self._session.get(API_BASE + endpoint, headers={'X-Csrf-Token': self.csrf})
+            response = await self._session.get(
+                API_BASE + endpoint, headers={"X-Csrf-Token": self.csrf}
+            )
             if response.status == 204:
                 # no data
                 return None
 
             if response.status != 200:
-                raise SessionExpiredException("API returned status code: %s " % response.status)
+                raise SessionExpiredException(
+                    "API returned status code: %s " % response.status
+                )
 
             data = await response.json()
             _LOGGER.debug("getEndpoint %s", json.dumps(data))
@@ -94,7 +102,11 @@ class GeneracApiClient:
 
     async def login(self) -> None:
         """Login to API"""
-        login_response = await (await self._session.get(f"{API_BASE}/Auth/SignIn?email={self._username}", allow_redirects=True)).text()
+        login_response = await (
+            await self._session.get(
+                f"{API_BASE}/Auth/SignIn?email={self._username}", allow_redirects=True
+            )
+        ).text()
 
         if await self.submit_form(login_response):
             return
@@ -110,15 +122,18 @@ class GeneracApiClient:
 
         self_asserted_response = await self._session.post(
             f"{LOGIN_BASE}/SelfAsserted",
-            headers={'X-Csrf-Token': sign_in_config.csrf},
+            headers={"X-Csrf-Token": sign_in_config.csrf},
             params={
                 "tx": "StateProperties=" + sign_in_config.transId,
-                "p": "B2C_1A_SignUpOrSigninOnline"
+                "p": "B2C_1A_SignUpOrSigninOnline",
             },
-            data=form_data)
+            data=form_data,
+        )
 
         if self_asserted_response.status != 200:
-            raise IOError(f"SelfAsserted: Bad response status: {self_asserted_response.status}")
+            raise IOError(
+                f"SelfAsserted: Bad response status: {self_asserted_response.status}"
+            )
         satxt = await self_asserted_response.text()
 
         sa = from_dict(SelfAssertedResponse, json.loads(satxt))
@@ -131,11 +146,14 @@ class GeneracApiClient:
             params={
                 "csrf_token": sign_in_config.csrf,
                 "tx": "StateProperties=" + sign_in_config.transId,
-                "p": "B2C_1A_SignUpOrSigninOnline"
-            })
+                "p": "B2C_1A_SignUpOrSigninOnline",
+            },
+        )
 
         if confirmed_response.status != 200:
-            raise IOError(f"CombinedSigninAndSignup: Bad response status: {confirmed_response.status}")
+            raise IOError(
+                f"CombinedSigninAndSignup: Bad response status: {confirmed_response.status}"
+            )
 
         loginString = await confirmed_response.text()
         if not await self.submit_form(loginString):

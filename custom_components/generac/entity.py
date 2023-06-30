@@ -17,11 +17,12 @@ _LOGGER: logging.Logger = logging.getLogger(__package__)
 
 class GeneracEntity(CoordinatorEntity[GeneracDataUpdateCoordinator]):
     def __init__(
-            self,
-            coordinator : GeneracDataUpdateCoordinator,
-            config_entry: ConfigEntry,
-            generator_id: str,
-            item: Item):
+        self,
+        coordinator: GeneracDataUpdateCoordinator,
+        config_entry: ConfigEntry,
+        generator_id: str,
+        item: Item,
+    ):
         super().__init__(coordinator)
         self.config_entry = config_entry
         self.generator_id = generator_id

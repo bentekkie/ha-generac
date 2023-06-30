@@ -14,7 +14,9 @@ from .coordinator import GeneracDataUpdateCoordinator
 from .entity import GeneracEntity
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+):
     """Setup binary_sensor platform."""
     coordinator: GeneracDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
     data = coordinator.data
@@ -40,6 +42,7 @@ def sensors() -> list[Type[GeneracEntity]]:
 
 class StatusSensor(GeneracEntity, SensorEntity):
     """generac Sensor class."""
+
     options = [
         "Ready",
         "Running",
@@ -49,7 +52,7 @@ class StatusSensor(GeneracEntity, SensorEntity):
         "Communication Issue",
         "Unknown",
     ]
-    icon = 'mdi:power'
+    icon = "mdi:power"
     device_class = SensorDeviceClass.ENUM
 
     @property
@@ -75,6 +78,7 @@ class StatusSensor(GeneracEntity, SensorEntity):
 
 class RunTimeSensor(GeneracEntity, SensorEntity):
     """generac Sensor class."""
+
     device_class = SensorDeviceClass.DURATION
     native_unit_of_measurement = "h"
 
@@ -86,7 +90,10 @@ class RunTimeSensor(GeneracEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the state of the sensor."""
-        val = next((prop.value for prop in self.aparatus_detail.properties if prop.type == 70), 0)
+        val = next(
+            (prop.value for prop in self.aparatus_detail.properties if prop.type == 70),
+            0,
+        )
         if isinstance(val, str):
             val = float(val)
         return val
@@ -94,6 +101,7 @@ class RunTimeSensor(GeneracEntity, SensorEntity):
 
 class ProtectionTimeSensor(GeneracEntity, SensorEntity):
     """generac Sensor class."""
+
     device_class = SensorDeviceClass.DURATION
     native_unit_of_measurement = "h"
 
@@ -105,7 +113,10 @@ class ProtectionTimeSensor(GeneracEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the state of the sensor."""
-        val = next((prop.value for prop in self.aparatus_detail.properties if prop.type == 31), 0)
+        val = next(
+            (prop.value for prop in self.aparatus_detail.properties if prop.type == 31),
+            0,
+        )
         if isinstance(val, str):
             val = float(val)
         return val
@@ -113,6 +124,7 @@ class ProtectionTimeSensor(GeneracEntity, SensorEntity):
 
 class ActivationDateSensor(GeneracEntity, SensorEntity):
     """generac Sensor class."""
+
     device_class = SensorDeviceClass.TIMESTAMP
 
     @property
@@ -123,11 +135,14 @@ class ActivationDateSensor(GeneracEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the state of the sensor."""
-        return datetime.strptime(self.aparatus_detail.activationDate, "%Y-%m-%dT%H:%M:%S%z")
+        return datetime.strptime(
+            self.aparatus_detail.activationDate, "%Y-%m-%dT%H:%M:%S%z"
+        )
 
 
 class LastSeenSensor(GeneracEntity, SensorEntity):
     """generac Sensor class."""
+
     device_class = SensorDeviceClass.TIMESTAMP
 
     @property
@@ -138,11 +153,14 @@ class LastSeenSensor(GeneracEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the state of the sensor."""
-        return datetime.strptime(self.aparatus_detail.lastSeen, "%Y-%m-%dT%H:%M:%S.%f%z")
+        return datetime.strptime(
+            self.aparatus_detail.lastSeen, "%Y-%m-%dT%H:%M:%S.%f%z"
+        )
 
 
 class ConnectionTimeSensor(GeneracEntity, SensorEntity):
     """generac Sensor class."""
+
     device_class = SensorDeviceClass.TIMESTAMP
 
     @property
@@ -153,11 +171,14 @@ class ConnectionTimeSensor(GeneracEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the state of the sensor."""
-        return datetime.strptime(self.aparatus_detail.connectionTimestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
+        return datetime.strptime(
+            self.aparatus_detail.connectionTimestamp, "%Y-%m-%dT%H:%M:%S.%f%z"
+        )
 
 
 class BatteryVoltageSensor(GeneracEntity, SensorEntity):
     """generac Sensor class."""
+
     device_class = SensorDeviceClass.VOLTAGE
     native_unit_of_measurement = "V"
 
@@ -169,10 +190,14 @@ class BatteryVoltageSensor(GeneracEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the state of the sensor."""
-        val = next((prop.value for prop in self.aparatus_detail.properties if prop.type == 69), 0)
+        val = next(
+            (prop.value for prop in self.aparatus_detail.properties if prop.type == 69),
+            0,
+        )
         if isinstance(val, str):
             val = float(val)
         return val
+
 
 # class SignalStrengthSensor(GeneracEntity, SensorEntity):
 #     """generac Sensor class."""

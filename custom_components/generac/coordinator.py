@@ -19,10 +19,7 @@ class GeneracDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Item]]):
     """Class to manage fetching data from the API."""
 
     def __init__(
-        self,
-        hass: HomeAssistant,
-        client: GeneracApiClient,
-        config_entry: ConfigEntry
+        self, hass: HomeAssistant, client: GeneracApiClient, config_entry: ConfigEntry
     ) -> None:
         """Initialize."""
         self.hass = hass

@@ -5,9 +5,11 @@ DOMAIN = "generac"
 DOMAIN_DATA = f"{DOMAIN}_data"
 VERSION = "0.0.0"
 
-ATTRIBUTION = ("Data provided by https://app.mobilelinkgen.com/api. "
-               "This is reversed engineered. Heavily inspired by "
-               "https://github.com/digitaldan/openhab-addons/blob/generac-2.0/bundles/org.openhab.binding.generacmobilelink/README.md")
+ATTRIBUTION = (
+    "Data provided by https://app.mobilelinkgen.com/api. "
+    "This is reversed engineered. Heavily inspired by "
+    "https://github.com/digitaldan/openhab-addons/blob/generac-2.0/bundles/org.openhab.binding.generacmobilelink/README.md"
+)
 ISSUE_URL = "https://github.com/bentekkie/ha-generac/issues"
 
 # Platforms
