@@ -2,7 +2,7 @@
 Custom integration to integrate generac with Home Assistant.
 
 For more details about this integration, please refer to
-https://github.com/bentekkie/ha-generac
+https://github.com/bentekkie/generac
 """
 import asyncio
 import logging
@@ -13,8 +13,6 @@ from homeassistant.core import Config
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from .api import GeneracApiClient
 from .const import CONF_PASSWORD
@@ -22,6 +20,7 @@ from .const import CONF_USERNAME
 from .const import DOMAIN
 from .const import PLATFORMS
 from .const import STARTUP_MESSAGE
+from .coordinator import GeneracDataUpdateCoordinator
 
 SCAN_INTERVAL = timedelta(seconds=30)
 
@@ -62,34 +61,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     entry.add_update_listener(async_reload_entry)
     return True
-
-
-class GeneracDataUpdateCoordinator(DataUpdateCoordinator):
-    """Class to manage fetching data from the API."""
-
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        client: GeneracApiClient,
-        config_entry: ConfigEntry
-    ) -> None:
-        """Initialize."""
-        self.hass = hass
-        self.api = client
-        self._config_entry = config_entry
-        self.platforms = []
-        self.is_online = False
-
-        super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
-
-    async def _async_update_data(self):
-        """Update data via library."""
-        try:
-            items = await self.api.async_get_data()
-            self.is_online = True
-            return items
-        except Exception as exception:
-            raise UpdateFailed() from exception
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

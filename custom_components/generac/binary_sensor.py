@@ -1,31 +1,36 @@
 """Binary sensor platform for generac."""
+from typing import Type
+
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DEFAULT_NAME
 from .const import DOMAIN
+from .coordinator import GeneracDataUpdateCoordinator
 from .entity import GeneracEntity
-from .models import Apparatus
-from .models import ApparatusDetail
 
 
-async def async_setup_entry(hass, entry, async_add_devices):
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
     """Setup binary_sensor platform."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]
-    data : dict[str, tuple[Apparatus, ApparatusDetail]] = coordinator.data
-    async_add_devices(
-        sensor
-        for generator_id, item in data.items()
-        for sensor in create_sensors(coordinator, entry, generator_id, item)
-    )
+    coordinator: GeneracDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+    data = coordinator.data
+    if isinstance(data, dict):
+        async_add_entities(
+            sensor(coordinator, entry, generator_id, item)
+            for generator_id, item in data.items()
+            for sensor in sensors()
+        )
 
 
-def create_sensors(coordinator, entry, generator_id, item):
+def sensors() -> Type[GeneracEntity]:
     return [
-        GeneracConnectedSensor(coordinator, entry, generator_id, item),
-        GeneracConnectingSensor(coordinator, entry, generator_id, item),
-        GeneracMaintenanceAlertSensor(coordinator, entry, generator_id, item),
-        GeneracWarningSensor(coordinator, entry, generator_id, item),
+        GeneracConnectedSensor,
+        GeneracConnectingSensor,
+        GeneracMaintenanceAlertSensor,
+        GeneracWarningSensor,
     ]
 
 

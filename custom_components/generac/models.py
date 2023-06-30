@@ -180,3 +180,9 @@ class ApparatusDetail:
     hasActiveVppEvent: bool
     productInfo: list[Property]
     hasDisconnectedNotificationsOn: bool
+
+
+@dataclass
+class Item:
+    apparatus: Apparatus
+    apparatusDetail: ApparatusDetail

@@ -8,6 +8,7 @@ from dacite import from_dict
 
 from .models import Apparatus
 from .models import ApparatusDetail
+from .models import Item
 from .models import SelfAssertedResponse
 from .models import SignInConfig
 
@@ -45,7 +46,7 @@ class GeneracApiClient:
         self._logged_in = False
         self.csrf = ""
 
-    async def async_get_data(self) -> dict:
+    async def async_get_data(self) -> dict[str, Item] | None:
         """Get data from the API."""
         try:
             if not self._logged_in:
@@ -62,7 +63,7 @@ class GeneracApiClient:
             _LOGGER.debug("Could not decode apparatuses response")
             return None
 
-        data : dict[str, tuple[Apparatus, ApparatusDetail]] = {}
+        data : dict[str, Item] = {}
         for apparatus in apparatuses:
             apparatus = from_dict(Apparatus, apparatus)
             if apparatus.type != 0:
@@ -70,7 +71,7 @@ class GeneracApiClient:
                 continue
             detail_json = await self.get_endpoint(f"/v1/Apparatus/details/{apparatus.apparatusId}")
             detail = from_dict(ApparatusDetail, detail_json)
-            data[str(apparatus.apparatusId)] = (apparatus, detail)
+            data[str(apparatus.apparatusId)] = Item(apparatus, detail)
         return data
 
     async def get_endpoint(self, endpoint: str):

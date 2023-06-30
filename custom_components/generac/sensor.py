@@ -1,36 +1,40 @@
 """Sensor platform for generac."""
 from datetime import datetime
+from typing import Type
 
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.sensor import SensorEntity
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DEFAULT_NAME
 from .const import DOMAIN
+from .coordinator import GeneracDataUpdateCoordinator
 from .entity import GeneracEntity
-from .models import Apparatus
-from .models import ApparatusDetail
 
 
-async def async_setup_entry(hass, entry, async_add_devices):
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
     """Setup binary_sensor platform."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]
-    data : dict[str, tuple[Apparatus, ApparatusDetail]] = coordinator.data
-    async_add_devices(
-        sensor
-        for generator_id, item in data.items()
-        for sensor in create_sensors(coordinator, entry, generator_id, item)
-    )
+    coordinator: GeneracDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+    data = coordinator.data
+    if isinstance(data, dict):
+        async_add_entities(
+            sensor(coordinator, entry, generator_id, item)
+            for generator_id, item in data.items()
+            for sensor in sensors()
+        )
 
 
-def create_sensors(coordinator, entry, generator_id, item):
+def sensors() -> list[Type[GeneracEntity]]:
     return [
-        StatusSensor(coordinator, entry, generator_id, item),
-        RunTimeSensor(coordinator, entry, generator_id, item),
-        ProtectionTimeSensor(coordinator, entry, generator_id, item),
-        ActivationDateSensor(coordinator, entry, generator_id, item),
-        LastSeenSensor(coordinator, entry, generator_id, item),
-        ConnectionTimeSensor(coordinator, entry, generator_id, item),
-        BatteryVoltageSensor(coordinator, entry, generator_id, item),
+        StatusSensor,
+        RunTimeSensor,
+        ProtectionTimeSensor,
+        ActivationDateSensor,
+        LastSeenSensor,
+        ConnectionTimeSensor,
+        BatteryVoltageSensor,
     ]
 
 

@@ -1,16 +1,27 @@
 """GeneracEntity class"""
+import logging
+
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import callback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import ATTRIBUTION
 from .const import DOMAIN
+from .coordinator import GeneracDataUpdateCoordinator
 from .models import Apparatus
 from .models import ApparatusDetail
+from .models import Item
+
+_LOGGER: logging.Logger = logging.getLogger(__package__)
 
 
-class GeneracEntity(CoordinatorEntity):
-
-    def __init__(self, coordinator, config_entry, generator_id, item):
+class GeneracEntity(CoordinatorEntity[GeneracDataUpdateCoordinator]):
+    def __init__(
+            self,
+            coordinator : GeneracDataUpdateCoordinator,
+            config_entry: ConfigEntry,
+            generator_id: str,
+            item: Item):
         super().__init__(coordinator)
         self.config_entry = config_entry
         self.generator_id = generator_id
@@ -54,20 +65,22 @@ class GeneracEntity(CoordinatorEntity):
 
     async def async_added_to_hass(self) -> None:
         """Connect to dispatcher listening for entity data notifications."""
+        await super().async_added_to_hass()
         self.async_on_remove(
             self.coordinator.async_add_listener(self.async_write_ha_state)
         )
 
     @property
     def aparatus(self) -> Apparatus:
-        return self.item[0]
+        return self.item.apparatus
 
     @property
     def aparatus_detail(self) -> ApparatusDetail:
-        return self.item[1]
+        return self.item.apparatusDetail
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
         self.item = self.coordinator.data.get(self.generator_id)
+        _LOGGER.debug(f"Updated data for {self.unique_id}: {self.item}")
         self.async_write_ha_state()
