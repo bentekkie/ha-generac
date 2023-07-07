@@ -1,5 +1,5 @@
 aiohttp==3.8.4
 beautifulsoup4==4.12.2
 dacite==1.8.1
-homeassistant==2023.6.3
+homeassistant==2023.7.1
 voluptuous==0.13.1
