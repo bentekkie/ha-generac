@@ -63,6 +63,8 @@ class StatusSensor(GeneracEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the state of the sensor."""
+        if self.aparatus_detail.apparatusStatus is None:
+            return self.options[-1]
         index = self.aparatus_detail.apparatusStatus - 1
         if index < 0 or index > len(self.options) - 1:
             index = len(self.options) - 1
@@ -90,6 +92,8 @@ class RunTimeSensor(GeneracEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the state of the sensor."""
+        if self.aparatus_detail.properties is None:
+            return 0
         val = next(
             (prop.value for prop in self.aparatus_detail.properties if prop.type == 70),
             0,
@@ -113,6 +117,8 @@ class ProtectionTimeSensor(GeneracEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the state of the sensor."""
+        if self.aparatus_detail.properties is None:
+            return 0
         val = next(
             (prop.value for prop in self.aparatus_detail.properties if prop.type == 31),
             0,
@@ -135,6 +141,8 @@ class ActivationDateSensor(GeneracEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the state of the sensor."""
+        if self.aparatus_detail.activationDate is None:
+            return None
         return datetime.strptime(
             self.aparatus_detail.activationDate, "%Y-%m-%dT%H:%M:%S%z"
         )
@@ -153,6 +161,8 @@ class LastSeenSensor(GeneracEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the state of the sensor."""
+        if self.aparatus_detail.lastSeen is None:
+            return None
         return datetime.strptime(
             self.aparatus_detail.lastSeen, "%Y-%m-%dT%H:%M:%S.%f%z"
         )
@@ -171,6 +181,8 @@ class ConnectionTimeSensor(GeneracEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the state of the sensor."""
+        if self.aparatus_detail.connectionTimestamp is None:
+            return None
         return datetime.strptime(
             self.aparatus_detail.connectionTimestamp, "%Y-%m-%dT%H:%M:%S.%f%z"
         )
@@ -190,6 +202,8 @@ class BatteryVoltageSensor(GeneracEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the state of the sensor."""
+        if self.aparatus_detail.properties is None:
+            return 0
         val = next(
             (prop.value for prop in self.aparatus_detail.properties if prop.type == 69),
             0,

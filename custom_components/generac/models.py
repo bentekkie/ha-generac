@@ -4,110 +4,110 @@ from typing import Optional
 
 @dataclass
 class SelfAssertedResponse:
-    status: str
+    status: Optional[str]
     errorCode: Optional[str]
     message: Optional[str]
 
 
 @dataclass
 class Locale:
-    lang: str
+    lang: Optional[str]
 
 
 @dataclass
 class XhrSettings:
-    retryEnabled: bool
-    retryMaxAttempts: int
-    retryDelay: int
-    retryExponent: int
-    retryOn: list[str]
+    retryEnabled: Optional[bool]
+    retryMaxAttempts: Optional[int]
+    retryDelay: Optional[int]
+    retryExponent: Optional[int]
+    retryOn: Optional[list[str]]
 
 
 @dataclass
 class SignInConfig:
-    remoteResource: str
-    retryLimit: int
-    trimSpacesInPassword: bool
-    api: str
-    csrf: str
-    transId: str
-    pageViewId: str
-    suppressElementCss: bool
-    isPageViewIdSentWithHeader: bool
-    allowAutoFocusOnPasswordField: bool
-    pageMode: int
-    config: dict[str, str]
-    hosts: dict[str, str]
-    locale: Locale
-    xhrSettings: XhrSettings
+    remoteResource: Optional[str]
+    retryLimit: Optional[int]
+    trimSpacesInPassword: Optional[bool]
+    api: Optional[str]
+    csrf: Optional[str]
+    transId: Optional[str]
+    pageViewId: Optional[str]
+    suppressElementCss: Optional[bool]
+    isPageViewIdSentWithHeader: Optional[bool]
+    allowAutoFocusOnPasswordField: Optional[bool]
+    pageMode: Optional[int]
+    config: dict[str, Optional[str]]
+    hosts: dict[str, Optional[str]]
+    locale: Optional[Locale]
+    xhrSettings: Optional[XhrSettings]
 
 
 @dataclass
 class ApparatusProperty:
-    name: str
-    value: str
-    type: str
+    name: Optional[str]
+    value: Optional[str]
+    type: Optional[str]
 
 
 @dataclass
 class ApparatusAttribute:
-    name: str
-    value: str
-    type: int
+    name: Optional[str]
+    value: Optional[str]
+    type: Optional[int]
 
 
 @dataclass
 class ApparatusInfo:
-    apparatusId: int
-    apparatusName: str
-    productType: str
-    description: str
-    properties: list[ApparatusProperty]
-    attributes: list[ApparatusAttribute]
+    apparatusId: Optional[int]
+    apparatusName: Optional[str]
+    productType: Optional[str]
+    description: Optional[str]
+    properties: Optional[list[ApparatusProperty]]
+    attributes: Optional[list[ApparatusAttribute]]
 
 
 @dataclass
 class Weather:
     @dataclass
     class Temperature:
-        value: float
-        unit: str
-        unitType: int
+        value: Optional[float]
+        unit: Optional[str]
+        unitType: Optional[int]
 
-    temperature: Temperature
-    iconCode: int
+    temperature: Optional[Temperature]
+    iconCode: Optional[int]
 
 
 @dataclass()
 class Apparatus:
-    apparatusId: int
-    serialNumber: str
-    name: str
-    type: int
-    localizedAddress: str
+    apparatusId: Optional[int]
+    serialNumber: Optional[str]
+    name: Optional[str]
+    type: Optional[int]
+    localizedAddress: Optional[str]
     materialDescription: Optional[str]
-    heroImageUrl: str
-    apparatusStatus: int
-    isConnected: bool
-    isConnecting: bool
-    showWarning: bool
-    weather: Weather
+    heroImageUrl: Optional[str]
+    apparatusStatus: Optional[int]
+    isConnected: Optional[bool]
+    isConnecting: Optional[bool]
+    showWarning: Optional[bool]
+    weather: Optional[Weather]
     preferredDealerName: Optional[str]
     preferredDealerPhone: Optional[str]
     preferredDealerEmail: Optional[str]
-    isDealerManaged: bool
-    isDealerUnmonitored: bool
-    modelNumber: str
-    panelId: str
+    isDealerManaged: Optional[bool]
+    isDealerUnmonitored: Optional[bool]
+    modelNumber: Optional[str]
+    panelId: Optional[str]
 
     @dataclass
     class Property:
-        name: str
+        name: Optional[str]
 
         @dataclass
         class Value:
             type: Optional[int]
-            status: int | str
+            status: Optional[int] | Optional[str]
             isLegacy: Optional[bool]
             isRunning: Optional[bool]
             deviceId: Optional[str]
@@ -115,32 +115,32 @@ class Apparatus:
             signalStrength: Optional[str]
             batteryLevel: Optional[str]
 
-        value: Value
-        type: int
+        value: Optional[Value]
+        type: Optional[int]
 
-    properties: list[Property]
+    properties: Optional[list[Property]]
 
 
 @dataclass
 class Address:
     """generated source for class Address"""
 
-    line1: str
+    line1: Optional[str]
     line2: Optional[str]
-    city: str
-    region: str
-    country: str
-    postalCode: str
+    city: Optional[str]
+    region: Optional[str]
+    country: Optional[str]
+    postalCode: Optional[str]
 
 
 @dataclass
 class Subscription:
     """generated source for class Subscription"""
 
-    type: int
-    status: int
-    isLegacy: bool
-    isDunning: bool
+    type: Optional[int]
+    status: Optional[int]
+    isLegacy: Optional[bool]
+    isDunning: Optional[bool]
 
 
 @dataclass
@@ -148,43 +148,43 @@ class ApparatusDetail:
     @dataclass
     class Property:
         name: Optional[str]
-        value: str | int | float
-        type: int
+        value: Optional[str] | Optional[int] | float
+        type: Optional[int]
 
     @dataclass
     class ProductInfo:
-        name: str
-        value: str
-        type: int
+        name: Optional[str]
+        value: Optional[str]
+        type: Optional[int]
 
-    apparatusId: int
-    name: str
-    serialNumber: str
-    apparatusClassification: int
-    panelId: str
-    activationDate: str
-    deviceType: str
-    deviceSsid: str
+    apparatusId: Optional[int]
+    name: Optional[str]
+    serialNumber: Optional[str]
+    apparatusClassification: Optional[int]
+    panelId: Optional[str]
+    activationDate: Optional[str]
+    deviceType: Optional[str]
+    deviceSsid: Optional[str]
     shortDeviceId: Optional[str]
-    apparatusStatus: int
-    heroImageUrl: str
-    statusLabel: str
-    statusText: str
+    apparatusStatus: Optional[int]
+    heroImageUrl: Optional[str]
+    statusLabel: Optional[str]
+    statusText: Optional[str]
     eCodeLabel: Optional[str]
-    weather: Weather
-    isConnected: bool
-    isConnecting: bool
-    showWarning: bool
-    hasMaintenanceAlert: bool
-    lastSeen: str
-    connectionTimestamp: str
-    address: Address
-    properties: list[Property]
-    subscription: Subscription
-    enrolledInVpp: bool
-    hasActiveVppEvent: bool
-    productInfo: list[Property]
-    hasDisconnectedNotificationsOn: bool
+    weather: Optional[Weather]
+    isConnected: Optional[bool]
+    isConnecting: Optional[bool]
+    showWarning: Optional[bool]
+    hasMaintenanceAlert: Optional[bool]
+    lastSeen: Optional[str]
+    connectionTimestamp: Optional[str]
+    address: Optional[Address]
+    properties: Optional[list[Property]]
+    subscription: Optional[Subscription]
+    enrolledInVpp: Optional[bool]
+    hasActiveVppEvent: Optional[bool]
+    productInfo: Optional[list[Property]]
+    hasDisconnectedNotificationsOn: Optional[bool]
 
 
 @dataclass
