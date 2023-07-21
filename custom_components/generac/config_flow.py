@@ -1,14 +1,20 @@
 """Adds config flow for generac."""
+import logging
+
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from .api import GeneracApiClient
+from .api import InvalidCredentialsException
 from .const import CONF_PASSWORD
 from .const import CONF_USERNAME
 from .const import DOMAIN
 from .const import PLATFORMS
+
+
+_LOGGER: logging.Logger = logging.getLogger(__package__)
 
 
 class GeneracFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
@@ -30,15 +36,15 @@ class GeneracFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         #     return self.async_abort(reason="single_instance_allowed")
 
         if user_input is not None:
-            valid = await self._test_credentials(
+            error = await self._test_credentials(
                 user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
             )
-            if valid:
+            if error is None:
                 return self.async_create_entry(
                     title=user_input[CONF_USERNAME], data=user_input
                 )
             else:
-                self._errors["base"] = "auth"
+                self._errors["base"] = error
 
             return await self._show_config_form(user_input)
 
@@ -65,10 +71,13 @@ class GeneracFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             session = async_create_clientsession(self.hass)
             client = GeneracApiClient(username, password, session)
             await client.async_get_data()
-            return True
-        except Exception:  # pylint: disable=broad-except
-            pass
-        return False
+            return None
+        except InvalidCredentialsException as e:  # pylint: disable=broad-except
+            _LOGGER.debug("ERROR in testing credentials: %s", e)
+            return "auth"
+        except Exception as e:  # pylint: disable=broad-except
+            _LOGGER.debug("ERROR: %s", e)
+            return "internal"
 
 
 class GeneracOptionsFlowHandler(config_entries.OptionsFlow):
