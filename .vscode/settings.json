@@ -1,15 +1,13 @@
 {
   "python.linting.pylintEnabled": false,
   "python.linting.enabled": true,
-  "python.pythonPath": "venv/bin/python",
   "files.associations": {
     "*.yaml": "home-assistant"
   },
   "[python]": {
-    "editor.defaultFormatter": "ms-python.autopep8",
     "editor.formatOnSave": true
   },
-  "python.formatting.provider": "none",
+  "python.formatting.provider": "black",
   "python.linting.flake8Enabled": true,
   "[json]": {
     "editor.quickSuggestions": {
@@ -17,5 +15,6 @@
     },
     "editor.suggest.insertMode": "replace",
     "editor.formatOnSave": false
-  }
+  },
+  "json.format.enable": false
 }
