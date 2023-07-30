@@ -35,7 +35,8 @@
         "ms-python.python",
         "ms-python.vscode-pylance",
         "ms-vscode.makefile-tools",
-        "ryanluker.vscode-coverage-gutters"
+        "ryanluker.vscode-coverage-gutters",
+        "ms-python.flake8"
       ]
     }
   },

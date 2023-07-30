@@ -5,6 +5,8 @@ from typing import Type
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import TEMP_CELSIUS
+from homeassistant.const import TEMP_FAHRENHEIT
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -12,6 +14,7 @@ from .const import DEFAULT_NAME
 from .const import DOMAIN
 from .coordinator import GeneracDataUpdateCoordinator
 from .entity import GeneracEntity
+from .models import Item
 
 
 async def async_setup_entry(
@@ -24,12 +27,12 @@ async def async_setup_entry(
         async_add_entities(
             sensor(coordinator, entry, generator_id, item)
             for generator_id, item in data.items()
-            for sensor in sensors()
+            for sensor in sensors(item)
         )
 
 
-def sensors() -> list[Type[GeneracEntity]]:
-    return [
+def sensors(item: Item) -> list[Type[GeneracEntity]]:
+    lst = [
         StatusSensor,
         RunTimeSensor,
         ProtectionTimeSensor,
@@ -37,7 +40,15 @@ def sensors() -> list[Type[GeneracEntity]]:
         LastSeenSensor,
         ConnectionTimeSensor,
         BatteryVoltageSensor,
+        DeviceTypeSensor,
     ]
+    if (
+        item.apparatusDetail.weather is not None
+        and item.apparatusDetail.weather.temperature is not None
+        and item.apparatusDetail.weather.temperature.value is not None
+    ):
+        lst.append(OutdoorTemperatureSensor)
+    return lst
 
 
 class StatusSensor(GeneracEntity, SensorEntity):
@@ -70,12 +81,37 @@ class StatusSensor(GeneracEntity, SensorEntity):
             index = len(self.options) - 1
         return self.options[index]
 
+
+class DeviceTypeSensor(GeneracEntity, SensorEntity):
+    """generac Sensor class."""
+
+    options = [
+        "Wifi",
+        "Ethernet",
+        "MobileData",
+        "Unknown",
+    ]
+    device_class = SensorDeviceClass.ENUM
+
     @property
-    def extra_state_attributes(self):
-        return {
-            "label": self.aparatus_detail.statusLabel,
-            "text": self.aparatus_detail.statusText,
-        }
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_device_type"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if self.aparatus_detail.deviceType is None:
+            return self.options[-1]
+        if self.aparatus_detail.deviceType == "wifi":
+            return self.options[0]
+        if self.aparatus_detail.deviceType == "eth":
+            return self.options[1]
+        if self.aparatus_detail.deviceType == "lte":
+            return self.options[2]
+        if self.aparatus_detail.deviceType == "cdma":
+            return self.options[2]
+        return self.options[-1]
 
 
 class RunTimeSensor(GeneracEntity, SensorEntity):
@@ -211,6 +247,40 @@ class BatteryVoltageSensor(GeneracEntity, SensorEntity):
         if isinstance(val, str):
             val = float(val)
         return val
+
+
+class OutdoorTemperatureSensor(GeneracEntity, SensorEntity):
+    """generac Sensor class."""
+
+    device_class = SensorDeviceClass.TEMPERATURE
+
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_outdoor_temperature"
+
+    @property
+    def native_unit_of_measurement(self):
+        if (
+            self.aparatus_detail.weather is None
+            or self.aparatus_detail.weather.temperature is None
+            or self.aparatus_detail.weather.temperature.unit is None
+        ):
+            return TEMP_CELSIUS
+        if "f" in self.aparatus_detail.weather.temperature.unit.lower():
+            return TEMP_FAHRENHEIT
+        return TEMP_CELSIUS
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if (
+            self.aparatus_detail.weather is None
+            or self.aparatus_detail.weather.temperature is None
+            or self.aparatus_detail.weather.temperature.value is None
+        ):
+            return 0
+        return self.aparatus_detail.weather.temperature.value
 
 
 # class SignalStrengthSensor(GeneracEntity, SensorEntity):

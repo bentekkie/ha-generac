@@ -148,7 +148,7 @@ class ApparatusDetail:
     @dataclass
     class Property:
         name: Optional[str]
-        value: Optional[str] | Optional[int] | float
+        value: Optional[str | int | float]
         type: Optional[int]
 
     @dataclass
