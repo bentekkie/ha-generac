@@ -5,6 +5,8 @@ from typing import Type
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import TEMP_CELSIUS
+from homeassistant.const import TEMP_FAHRENHEIT
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -12,6 +14,7 @@ from .const import DEFAULT_NAME
 from .const import DOMAIN
 from .coordinator import GeneracDataUpdateCoordinator
 from .entity import GeneracEntity
+from .models import Item
 
 
 async def async_setup_entry(
@@ -28,8 +31,8 @@ async def async_setup_entry(
         )
 
 
-def sensors() -> list[Type[GeneracEntity]]:
-    return [
+def sensors(item: Item) -> list[Type[GeneracEntity]]:
+    lst = [
         StatusSensor,
         RunTimeSensor,
         ProtectionTimeSensor,
@@ -38,6 +41,13 @@ def sensors() -> list[Type[GeneracEntity]]:
         ConnectionTimeSensor,
         BatteryVoltageSensor,
     ]
+    if (
+        item.apparatusDetail.weather is not None
+        and item.apparatusDetail.weather.temperature is not None
+        and item.apparatusDetail.weather.temperature.value is not None
+    ):
+        lst.append(OutdoorTemperatureSensor)
+    return lst
 
 
 class StatusSensor(GeneracEntity, SensorEntity):
@@ -211,6 +221,40 @@ class BatteryVoltageSensor(GeneracEntity, SensorEntity):
         if isinstance(val, str):
             val = float(val)
         return val
+
+
+class OutdoorTemperatureSensor(GeneracEntity, SensorEntity):
+    """generac Sensor class."""
+
+    device_class = SensorDeviceClass.TEMPERATURE
+
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_outdoor_temperature"
+
+    @property
+    def native_unit_of_measurement(self):
+        if (
+            self.aparatus_detail.weather is None
+            or self.aparatus_detail.weather.temperature is None
+            or self.aparatus_detail.weather.temperature.unit is None
+        ):
+            return TEMP_CELSIUS
+        if "f" in self.aparatus_detail.weather.temperature.unit.lower():
+            return TEMP_FAHRENHEIT
+        return TEMP_CELSIUS
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if (
+            self.aparatus_detail.weather is None
+            or self.aparatus_detail.weather.temperature is None
+            or self.aparatus_detail.weather.temperature.value is None
+        ):
+            return 0
+        return self.aparatus_detail.weather.temperature.value
 
 
 # class SignalStrengthSensor(GeneracEntity, SensorEntity):
