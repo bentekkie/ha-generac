@@ -15,7 +15,8 @@ ISSUE_URL = "https://github.com/bentekkie/ha-generac/issues"
 # Platforms
 BINARY_SENSOR = "binary_sensor"
 SENSOR = "sensor"
-PLATFORMS = [BINARY_SENSOR, SENSOR]
+WEATHER = "weather"
+PLATFORMS = [BINARY_SENSOR, SENSOR, WEATHER]
 
 
 # Configuration and options
