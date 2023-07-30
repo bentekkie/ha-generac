@@ -3,6 +3,7 @@ import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import callback
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import ATTRIBUTION
@@ -35,20 +36,12 @@ class GeneracEntity(CoordinatorEntity[GeneracDataUpdateCoordinator]):
 
     @property
     def device_info(self):
-        return {
-            "identifiers": {(DOMAIN, self.generator_id)},
-            "name": self.aparatus.name,
-            "manufacturer": "Generac",
-            "serialNumber": self.aparatus.serialNumber,
-            "localizedAddress": self.aparatus.localizedAddress,
-            "heroImageUrl": self.aparatus.heroImageUrl,
-            "preferredDealerName": self.aparatus.preferredDealerName,
-            "preferredDealerPhone": self.aparatus.preferredDealerPhone,
-            "preferredDealerEmail": self.aparatus.preferredDealerEmail,
-            "modelNumber": self.aparatus.modelNumber,
-            "panelId": self.aparatus.panelId,
-            "ssid": self.aparatus_detail.deviceSsid,
-        }
+        return DeviceInfo(
+            identifiers={(DOMAIN, self.generator_id)},
+            name=self.aparatus.name,
+            model=self.aparatus.modelNumber,
+            manufacturer="Generac",
+        )
 
     @property
     def device_state_attributes(self):
@@ -57,6 +50,22 @@ class GeneracEntity(CoordinatorEntity[GeneracDataUpdateCoordinator]):
             "attribution": ATTRIBUTION,
             "id": str(self.generator_id),
             "integration": DOMAIN,
+        }
+
+    @property
+    def extra_state_attributes(self):
+        return {
+            "serial_number": self.aparatus.serialNumber,
+            "localized_address": self.aparatus.localizedAddress,
+            "hero_image_url": self.aparatus.heroImageUrl,
+            "preferred_dealer_name": self.aparatus.preferredDealerName,
+            "preferred_dealer_phone": self.aparatus.preferredDealerPhone,
+            "preferred_dealer_email": self.aparatus.preferredDealerEmail,
+            "model_number": self.aparatus.modelNumber,
+            "panel_id": self.aparatus.panelId,
+            "ssid": self.aparatus_detail.deviceSsid,
+            "status_label": self.aparatus_detail.statusLabel,
+            "status_text": self.aparatus_detail.statusText,
         }
 
     @property
