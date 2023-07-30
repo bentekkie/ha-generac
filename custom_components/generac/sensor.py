@@ -27,7 +27,7 @@ async def async_setup_entry(
         async_add_entities(
             sensor(coordinator, entry, generator_id, item)
             for generator_id, item in data.items()
-            for sensor in sensors()
+            for sensor in sensors(item)
         )
 
 
