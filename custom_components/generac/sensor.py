@@ -41,6 +41,16 @@ def sensors(item: Item) -> list[Type[GeneracEntity]]:
         ConnectionTimeSensor,
         BatteryVoltageSensor,
         DeviceTypeSensor,
+        DealerEmailSensor,
+        DealerNameSensor,
+        DealerPhoneSensor,
+        AddressSensor,
+        StatusTextSensor,
+        StatusLabelSensor,
+        SerialNumberSensor,
+        ModelNumberSensor,
+        DeviceSsidSensor,
+        PanelIDSensor,
     ]
     if (
         item.apparatusDetail.weather is not None
@@ -281,6 +291,126 @@ class OutdoorTemperatureSensor(GeneracEntity, SensorEntity):
         ):
             return 0
         return self.aparatus_detail.weather.temperature.value
+
+
+class SerialNumberSensor(GeneracEntity, SensorEntity):
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_serial_number"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        return self.aparatus.serialNumber
+
+
+class ModelNumberSensor(GeneracEntity, SensorEntity):
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_model_number"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        return self.aparatus.modelNumber
+
+
+class DeviceSsidSensor(GeneracEntity, SensorEntity):
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_device_ssid"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        return self.aparatus_detail.deviceSsid
+
+
+class StatusLabelSensor(GeneracEntity, SensorEntity):
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_status_label"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        return self.aparatus_detail.statusLabel
+
+
+class StatusTextSensor(GeneracEntity, SensorEntity):
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_status_text"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        return self.aparatus_detail.statusText
+
+
+class AddressSensor(GeneracEntity, SensorEntity):
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_address"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        return self.aparatus.localizedAddress
+
+
+class DealerNameSensor(GeneracEntity, SensorEntity):
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_dealer_name"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        return self.aparatus.preferredDealerName
+
+
+class DealerEmailSensor(GeneracEntity, SensorEntity):
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_dealer_email"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        return self.aparatus.preferredDealerEmail
+
+
+class DealerPhoneSensor(GeneracEntity, SensorEntity):
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_dealer_phone"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        return self.aparatus.preferredDealerPhone
+
+
+class PanelIDSensor(GeneracEntity, SensorEntity):
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_panel_id"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        return self.aparatus.panelId
 
 
 # class SignalStrengthSensor(GeneracEntity, SensorEntity):
