@@ -1,7 +1,7 @@
 pip==23.2.1
 pre-commit==3.3.3
 black==23.7.0
-flake8==6.0.0
+flake8==6.1.0
 reorder-python-imports==3.10.0
 beautifulsoup4==4.12.2
 dacite==1.8.1
