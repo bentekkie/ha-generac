@@ -53,22 +53,6 @@ class GeneracEntity(CoordinatorEntity[GeneracDataUpdateCoordinator]):
         }
 
     @property
-    def extra_state_attributes(self):
-        return {
-            "serial_number": self.aparatus.serialNumber,
-            "localized_address": self.aparatus.localizedAddress,
-            "hero_image_url": self.aparatus.heroImageUrl,
-            "preferred_dealer_name": self.aparatus.preferredDealerName,
-            "preferred_dealer_phone": self.aparatus.preferredDealerPhone,
-            "preferred_dealer_email": self.aparatus.preferredDealerEmail,
-            "model_number": self.aparatus.modelNumber,
-            "panel_id": self.aparatus.panelId,
-            "ssid": self.aparatus_detail.deviceSsid,
-            "status_label": self.aparatus_detail.statusLabel,
-            "status_text": self.aparatus_detail.statusText,
-        }
-
-    @property
     def available(self):
         """Return True if entity is available."""
         return self.coordinator.is_online
