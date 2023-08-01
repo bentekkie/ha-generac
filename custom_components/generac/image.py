@@ -1,7 +1,5 @@
 """Image platform for generac."""
-from typing import Type
-
-from homeassistant.components.weather import WeatherEntity
+from homeassistant.components.image import ImageEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -21,18 +19,25 @@ async def async_setup_entry(
     data = coordinator.data
     if isinstance(data, dict):
         async_add_entities(
-            sensor(coordinator, entry, generator_id, item)
+            HeroImageSensor(coordinator, entry, generator_id, item, hass)
             for generator_id, item in data.items()
-            for sensor in sensors(item)
         )
 
 
-def sensors(item: Item) -> list[Type[GeneracEntity]]:
-    return [HeroImageSensor]
-
-
-class HeroImageSensor(GeneracEntity, WeatherEntity):
+class HeroImageSensor(GeneracEntity, ImageEntity):
     """generac Image class."""
+
+    def __init__(
+        self,
+        coordinator: GeneracDataUpdateCoordinator,
+        config_entry: ConfigEntry,
+        generator_id: str,
+        item: Item,
+        hass: HomeAssistant,
+    ):
+        """Initialize device."""
+        super().__init__(coordinator, config_entry, generator_id, item)
+        ImageEntity.__init__(self, hass)
 
     @property
     def name(self):
