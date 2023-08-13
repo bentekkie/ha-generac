@@ -16,6 +16,9 @@ from .models import Item
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
 
+_EMPTY_ITEM = Item(apparatus=Apparatus(), apparatusDetail=ApparatusDetail(), empty=True)
+
+
 class GeneracEntity(CoordinatorEntity[GeneracDataUpdateCoordinator]):
     def __init__(
         self,
@@ -55,7 +58,7 @@ class GeneracEntity(CoordinatorEntity[GeneracDataUpdateCoordinator]):
     @property
     def available(self):
         """Return True if entity is available."""
-        return self.coordinator.is_online
+        return self.coordinator.is_online and not self.item.empty
 
     async def async_added_to_hass(self) -> None:
         """Connect to dispatcher listening for entity data notifications."""
@@ -75,6 +78,6 @@ class GeneracEntity(CoordinatorEntity[GeneracDataUpdateCoordinator]):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self.item = self.coordinator.data.get(self.generator_id)
+        self.item = self.coordinator.data.get(self.generator_id, _EMPTY_ITEM)
         _LOGGER.debug(f"Updated data for {self.unique_id}: {self.item}")
         self.async_write_ha_state()

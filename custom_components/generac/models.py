@@ -80,25 +80,25 @@ class Weather:
 
 @dataclass()
 class Apparatus:
-    apparatusId: Optional[int]
-    serialNumber: Optional[str]
-    name: Optional[str]
-    type: Optional[int]
-    localizedAddress: Optional[str]
-    materialDescription: Optional[str]
-    heroImageUrl: Optional[str]
-    apparatusStatus: Optional[int]
-    isConnected: Optional[bool]
-    isConnecting: Optional[bool]
-    showWarning: Optional[bool]
-    weather: Optional[Weather]
-    preferredDealerName: Optional[str]
-    preferredDealerPhone: Optional[str]
-    preferredDealerEmail: Optional[str]
-    isDealerManaged: Optional[bool]
-    isDealerUnmonitored: Optional[bool]
-    modelNumber: Optional[str]
-    panelId: Optional[str]
+    apparatusId: Optional[int] = None
+    serialNumber: Optional[str] = None
+    name: Optional[str] = None
+    type: Optional[int] = None
+    localizedAddress: Optional[str] = None
+    materialDescription: Optional[str] = None
+    heroImageUrl: Optional[str] = None
+    apparatusStatus: Optional[int] = None
+    isConnected: Optional[bool] = None
+    isConnecting: Optional[bool] = None
+    showWarning: Optional[bool] = None
+    weather: Optional[Weather] = None
+    preferredDealerName: Optional[str] = None
+    preferredDealerPhone: Optional[str] = None
+    preferredDealerEmail: Optional[str] = None
+    isDealerManaged: Optional[bool] = None
+    isDealerUnmonitored: Optional[bool] = None
+    modelNumber: Optional[str] = None
+    panelId: Optional[str] = None
 
     @dataclass
     class Property:
@@ -118,7 +118,7 @@ class Apparatus:
         value: Optional[Value | list]
         type: Optional[int]
 
-    properties: Optional[list[Property]]
+    properties: Optional[list[Property]] = None
 
 
 @dataclass
@@ -157,37 +157,38 @@ class ApparatusDetail:
         value: Optional[str]
         type: Optional[int]
 
-    apparatusId: Optional[int]
-    name: Optional[str]
-    serialNumber: Optional[str]
-    apparatusClassification: Optional[int]
-    panelId: Optional[str]
-    activationDate: Optional[str]
-    deviceType: Optional[str]
-    deviceSsid: Optional[str]
-    shortDeviceId: Optional[str]
-    apparatusStatus: Optional[int]
-    heroImageUrl: Optional[str]
-    statusLabel: Optional[str]
-    statusText: Optional[str]
-    eCodeLabel: Optional[str]
-    weather: Optional[Weather]
-    isConnected: Optional[bool]
-    isConnecting: Optional[bool]
-    showWarning: Optional[bool]
-    hasMaintenanceAlert: Optional[bool]
-    lastSeen: Optional[str]
-    connectionTimestamp: Optional[str]
-    address: Optional[Address]
-    properties: Optional[list[Property]]
-    subscription: Optional[Subscription]
-    enrolledInVpp: Optional[bool]
-    hasActiveVppEvent: Optional[bool]
-    productInfo: Optional[list[Property]]
-    hasDisconnectedNotificationsOn: Optional[bool]
+    apparatusId: Optional[int] = None
+    name: Optional[str] = None
+    serialNumber: Optional[str] = None
+    apparatusClassification: Optional[int] = None
+    panelId: Optional[str] = None
+    activationDate: Optional[str] = None
+    deviceType: Optional[str] = None
+    deviceSsid: Optional[str] = None
+    shortDeviceId: Optional[str] = None
+    apparatusStatus: Optional[int] = None
+    heroImageUrl: Optional[str] = None
+    statusLabel: Optional[str] = None
+    statusText: Optional[str] = None
+    eCodeLabel: Optional[str] = None
+    weather: Optional[Weather] = None
+    isConnected: Optional[bool] = None
+    isConnecting: Optional[bool] = None
+    showWarning: Optional[bool] = None
+    hasMaintenanceAlert: Optional[bool] = None
+    lastSeen: Optional[str] = None
+    connectionTimestamp: Optional[str] = None
+    address: Optional[Address] = None
+    properties: Optional[list[Property]] = None
+    subscription: Optional[Subscription] = None
+    enrolledInVpp: Optional[bool] = None
+    hasActiveVppEvent: Optional[bool] = None
+    productInfo: Optional[list[Property]] = None
+    hasDisconnectedNotificationsOn: Optional[bool] = None
 
 
 @dataclass
 class Item:
     apparatus: Apparatus
     apparatusDetail: ApparatusDetail
+    empty: bool = False
