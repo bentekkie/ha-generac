@@ -1,4 +1,7 @@
 """Image platform for generac."""
+import mimetypes
+
+import httpx
 from homeassistant.components.image import ImageEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -52,3 +55,16 @@ class HeroImageSensor(GeneracEntity, ImageEntity):
     def available(self):
         """Return True if entity is available."""
         return super().available and self.aparatus_detail.heroImageUrl is not None
+
+    async def _fetch_url(self, url: str) -> httpx.Response | None:
+        """Fetch a URL."""
+        resp = await super()._fetch_url(url)
+        if (
+            resp is not None
+            and "image" not in resp.headers.get("content-type")
+            and self.aparatus_detail.heroImageUrl
+        ):
+            guess = mimetypes.guess_type(self.aparatus_detail.heroImageUrl)[0]
+            if guess is not None:
+                resp.headers["content-type"] = guess
+        return resp
