@@ -47,3 +47,8 @@ class HeroImageSensor(GeneracEntity, ImageEntity):
     @property
     def image_url(self):
         return self.aparatus_detail.heroImageUrl
+
+    @property
+    def available(self):
+        """Return True if entity is available."""
+        return super().available and self.aparatus_detail.heroImageUrl is not None

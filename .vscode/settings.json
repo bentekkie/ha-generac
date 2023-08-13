@@ -5,9 +5,10 @@
     "*.yaml": "home-assistant"
   },
   "[python]": {
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-python.black-formatter"
   },
-  "python.formatting.provider": "black",
+  "python.formatting.provider": "none",
   "python.linting.flake8Enabled": true,
   "[json]": {
     "editor.quickSuggestions": {
@@ -16,5 +17,7 @@
     "editor.suggest.insertMode": "replace",
     "editor.formatOnSave": false
   },
-  "json.format.enable": false
+  "json.format.enable": false,
+
+  "python.analysis.typeCheckingMode": "basic"
 }
