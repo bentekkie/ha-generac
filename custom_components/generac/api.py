@@ -1,6 +1,8 @@
 """Sample API Client."""
 import json
 import logging
+from typing import Any
+from typing import Mapping
 
 import aiohttp
 from bs4 import BeautifulSoup
@@ -29,7 +31,7 @@ class SessionExpiredException(Exception):
     pass
 
 
-def get_setting_json(page: str):
+def get_setting_json(page: str) -> Mapping[str, Any] | None:
     for line in page.splitlines():
         if line.startswith("var SETTINGS = ") and line.endswith(";"):
             return json.loads(line.removeprefix("var SETTINGS = ").removesuffix(";"))
@@ -62,6 +64,8 @@ class GeneracApiClient:
         if apparatuses is None:
             _LOGGER.debug("Could not decode apparatuses response")
             return None
+        if not isinstance(apparatuses, list):
+            _LOGGER.error("Expected list from /v2/Apparatus/list got %s", apparatuses)
 
         data: dict[str, Item] = {}
         for apparatus in apparatuses:
@@ -74,6 +78,11 @@ class GeneracApiClient:
             detail_json = await self.get_endpoint(
                 f"/v1/Apparatus/details/{apparatus.apparatusId}"
             )
+            if detail_json is None:
+                _LOGGER.debug(
+                    f"Could not decode respose from /v1/Apparatus/details/{apparatus.apparatusId}"
+                )
+                continue
             detail = from_dict(ApparatusDetail, detail_json)
             data[str(apparatus.apparatusId)] = Item(apparatus, detail)
         return data
@@ -112,12 +121,21 @@ class GeneracApiClient:
             return
 
         parse_settings = get_setting_json(login_response)
+        if parse_settings is None:
+            _LOGGER.debug(
+                "Unable to find csrf token in login page:\n%s", login_response
+            )
+            raise IOError("Unable to find csrf token in login page")
         sign_in_config = from_dict(SignInConfig, parse_settings)
 
         form_data = aiohttp.FormData()
         form_data.add_field("request_type", "RESPONSE")
         form_data.add_field("signInName", self._username)
         form_data.add_field("password", self._passeword)
+        if sign_in_config.csrf is None or sign_in_config.transId is None:
+            raise IOError(
+                "Missing csrf and/or transId in sign in config %s", sign_in_config
+            )
         self.csrf = sign_in_config.csrf
 
         self_asserted_response = await self._session.post(
