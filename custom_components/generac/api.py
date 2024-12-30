@@ -8,16 +8,13 @@ import aiohttp
 from bs4 import BeautifulSoup
 from dacite import from_dict
 
+from .const import API_BASE
+from .const import LOGIN_BASE
 from .models import Apparatus
 from .models import ApparatusDetail
 from .models import Item
 from .models import SelfAssertedResponse
 from .models import SignInConfig
-
-API_BASE = "https://app.mobilelinkgen.com/api"
-LOGIN_BASE = "https://generacconnectivity.b2clogin.com/generacconnectivity.onmicrosoft.com/B2C_1A_MobileLink_SignIn"
-
-TIMEOUT = 10
 
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
