@@ -42,7 +42,7 @@ def redact(data: Any, redact_all: bool):
         if is_ipv4(data):
             return "REDACTED_IPV4"
         if is_ipv6(data):
-            return "REDACTED_IPV4"
+            return "REDACTED_IPV6"
     if redact_all:
         return "REDACTED"
     return data
@@ -58,7 +58,7 @@ def is_ipv4(s: str):
 
 def is_ipv6(s: str):
     try:
-        ipaddress.IPv4Network(s)
+        ipaddress.IPv6Network(s)
         return True
     except ValueError:
         return False

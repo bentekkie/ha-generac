@@ -1,4 +1,4 @@
-"""Sample API Client."""
+"""MobileLink API Client for Generac."""
 import json
 import logging
 from typing import Any
@@ -38,9 +38,9 @@ class GeneracApiClient:
     def __init__(
         self, username: str, password: str, session: aiohttp.ClientSession
     ) -> None:
-        """Sample API Client."""
+        """MobileLink API Client for Generac."""
         self._username = username
-        self._passeword = password
+        self._password = password
         self._session = session
         self._logged_in = False
         self.csrf = ""
@@ -128,7 +128,7 @@ class GeneracApiClient:
         form_data = aiohttp.FormData()
         form_data.add_field("request_type", "RESPONSE")
         form_data.add_field("signInName", self._username)
-        form_data.add_field("password", self._passeword)
+        form_data.add_field("password", self._password)
         if sign_in_config.csrf is None or sign_in_config.transId is None:
             raise IOError(
                 "Missing csrf and/or transId in sign in config %s", sign_in_config
