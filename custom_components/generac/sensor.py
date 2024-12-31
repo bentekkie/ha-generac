@@ -62,13 +62,14 @@ def sensors(item: Item) -> list[Type[GeneracEntity]]:
 
 def parseDatetime(rawStr: str) -> datetime:
     formats = ["%Y-%m-%dT%H:%M:%S.%f%z", "%Y-%m-%dT%H:%M:%S%z"]
-    ves : list[ValueError] = []
+    ves: list[ValueError] = []
     for fmt in formats:
         try:
             return datetime.strptime(rawStr, fmt)
         except ValueError as ve:
             ves.append(ve)
-    raise ValueError(f'No known datetime format for raw string {rawStr}')
+    raise ValueError(f"No known datetime format for raw string {rawStr}")
+
 
 class StatusSensor(GeneracEntity, SensorEntity):
     """generac Sensor class."""
