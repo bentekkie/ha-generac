@@ -60,6 +60,17 @@ def sensors(item: Item) -> list[Type[GeneracEntity]]:
     return lst
 
 
+def parseDatetime(rawStr: str) -> datetime:
+    formats = ["%Y-%m-%dT%H:%M:%S.%f%z", "%Y-%m-%dT%H:%M:%S%z"]
+    ves: list[ValueError] = []
+    for fmt in formats:
+        try:
+            return datetime.strptime(rawStr, fmt)
+        except ValueError as ve:
+            ves.append(ve)
+    raise ValueError(f"No known datetime format for raw string {rawStr}")
+
+
 class StatusSensor(GeneracEntity, SensorEntity):
     """generac Sensor class."""
 
@@ -194,9 +205,7 @@ class ActivationDateSensor(GeneracEntity, SensorEntity):
         """Return the state of the sensor."""
         if self.aparatus_detail.activationDate is None:
             return None
-        return datetime.strptime(
-            self.aparatus_detail.activationDate, "%Y-%m-%dT%H:%M:%S%z"
-        )
+        return parseDatetime(self.aparatus_detail.activationDate)
 
 
 class LastSeenSensor(GeneracEntity, SensorEntity):
@@ -214,9 +223,7 @@ class LastSeenSensor(GeneracEntity, SensorEntity):
         """Return the state of the sensor."""
         if self.aparatus_detail.lastSeen is None:
             return None
-        return datetime.strptime(
-            self.aparatus_detail.lastSeen, "%Y-%m-%dT%H:%M:%S.%f%z"
-        )
+        return parseDatetime(self.aparatus_detail.lastSeen)
 
 
 class ConnectionTimeSensor(GeneracEntity, SensorEntity):
@@ -234,9 +241,7 @@ class ConnectionTimeSensor(GeneracEntity, SensorEntity):
         """Return the state of the sensor."""
         if self.aparatus_detail.connectionTimestamp is None:
             return None
-        return datetime.strptime(
-            self.aparatus_detail.connectionTimestamp, "%Y-%m-%dT%H:%M:%S.%f%z"
-        )
+        return parseDatetime(self.aparatus_detail.connectionTimestamp)
 
 
 class BatteryVoltageSensor(GeneracEntity, SensorEntity):
