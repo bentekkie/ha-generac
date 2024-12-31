@@ -13,6 +13,20 @@
 
 ## Installation
 
+### Installation via [HACS](https://hacs.xyz)
+
+1. [Open HACS](http://homeassistant.local:8123/hacs/dashboard) in your Home Assistant interface.
+2. Add this repository as a "Custom Repository" (https://github.com/bentekkie/ha-generac).
+3. On the HACs home screen, search for "Generac" and select it.
+4. Click the "Download" in bottom right of the page.
+5. Restart Home Assistant to apply the changes.
+6. Navigate to Configuration > Integrations.
+7. Click on the "+ Add Integration" button.
+8. Search for "Generac" and select it.
+9. Follow the on-screen instructions to complete the setup.
+
+### Manual Installation
+
 1. Using the tool of choice open the directory (folder) for your HA configuration (where you find `configuration.yaml`).
 2. If you do not have a `custom_components` directory (folder) there, you need to create it.
 3. In the `custom_components` directory (folder) create a new folder called `generac`.
@@ -41,9 +55,9 @@ custom_components/generac/sensor.py
 custom_components/generac/switch.py
 ```
 
-## Configuration is done in the UI
+## Configuration
 
-<!---->
+Configuration is done in the UI.
 
 ## Contributions are welcome!
 
