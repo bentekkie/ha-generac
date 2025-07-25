@@ -157,6 +157,26 @@ class ApparatusDetail:
         value: Optional[str]
         type: Optional[int]
 
+    @dataclass
+    class Alert:
+        eCode: Optional[int]
+        eventType: Optional[int]
+        timestamp: Optional[str]
+        type: Optional[int]
+
+    @dataclass
+    class Maintenance:
+        @dataclass
+        class Snmp:
+            label: Optional[str]
+            timestamp: Optional[str]
+            unit: Optional[str]
+            value: Optional[str]
+
+        label: Optional[str]
+        snmp: Optional[Snmp]
+        maintenanceCode: Optional[str]
+
     apparatusId: Optional[int] = None
     name: Optional[str] = None
     serialNumber: Optional[str] = None
@@ -166,25 +186,35 @@ class ApparatusDetail:
     deviceType: Optional[str] = None
     deviceSsid: Optional[str] = None
     shortDeviceId: Optional[str] = None
+    networkType: Optional[str] = None
     apparatusStatus: Optional[int] = None
     heroImageUrl: Optional[str] = None
     statusLabel: Optional[str] = None
     statusText: Optional[str] = None
+    alarmEcodeLabel: Optional[str] = None
     eCodeLabel: Optional[str] = None
     weather: Optional[Weather] = None
     isConnected: Optional[bool] = None
     isConnecting: Optional[bool] = None
+    serviceModeEnabled: Optional[bool] = None
     showWarning: Optional[bool] = None
     hasMaintenanceAlert: Optional[bool] = None
     lastSeen: Optional[str] = None
     connectionTimestamp: Optional[str] = None
     address: Optional[Address] = None
     properties: Optional[list[Property]] = None
+    tuProperties: Optional[list[Property]] = None
     subscription: Optional[Subscription] = None
     enrolledInVpp: Optional[bool] = None
     hasActiveVppEvent: Optional[bool] = None
-    productInfo: Optional[list[Property]] = None
+    productInfo: Optional[list[ProductInfo]] = None
+    disconnectedNotification: Optional[str] = None
     hasDisconnectedNotificationsOn: Optional[bool] = None
+    alert: Optional[Alert] = None
+    currentAlarm: Optional[str] = None
+    alarms: Optional[list] = None
+    maintenance: Optional[list[Maintenance]] = None
+    warnings: Optional[list] = None
 
 
 @dataclass

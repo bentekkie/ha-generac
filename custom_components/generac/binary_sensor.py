@@ -33,6 +33,10 @@ def sensors() -> Type[GeneracEntity]:
         GeneracConnectingSensor,
         GeneracMaintenanceAlertSensor,
         GeneracWarningSensor,
+        GeneracServiceModeSensor,
+        GeneracVppEnrolledSensor,
+        GeneracActiveVppEventSensor,
+        GeneracDisconnectedNotificationSensor,
     ]
 
 
@@ -110,3 +114,69 @@ class GeneracWarningSensor(GeneracEntity, BinarySensorEntity):
     def is_on(self):
         """Return true if the binary_sensor is on."""
         return self.aparatus_detail.showWarning
+
+
+class GeneracServiceModeSensor(GeneracEntity, BinarySensorEntity):
+    """Service Mode binary sensor from v5 API."""
+
+    @property
+    def name(self):
+        """Return the name of the binary_sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_service_mode_enabled"
+
+    @property
+    def device_class(self):
+        """Return the class of this binary_sensor."""
+        return BinarySensorDeviceClass.POWER
+
+    @property
+    def is_on(self):
+        """Return true if the binary_sensor is on."""
+        return self.aparatus_detail.serviceModeEnabled
+
+
+class GeneracVppEnrolledSensor(GeneracEntity, BinarySensorEntity):
+    """VPP Enrolled binary sensor from v5 API."""
+
+    @property
+    def name(self):
+        """Return the name of the binary_sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_vpp_enrolled"
+
+    @property
+    def is_on(self):
+        """Return true if the binary_sensor is on."""
+        return self.aparatus_detail.enrolledInVpp
+
+
+class GeneracActiveVppEventSensor(GeneracEntity, BinarySensorEntity):
+    """Active VPP Event binary sensor from v5 API."""
+
+    @property
+    def name(self):
+        """Return the name of the binary_sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_active_vpp_event"
+
+    @property
+    def is_on(self):
+        """Return true if the binary_sensor is on."""
+        return self.aparatus_detail.hasActiveVppEvent
+
+
+class GeneracDisconnectedNotificationSensor(GeneracEntity, BinarySensorEntity):
+    """Disconnected Notifications binary sensor from v5 API."""
+
+    @property
+    def name(self):
+        """Return the name of the binary_sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_disconnected_notifications"
+
+    @property
+    def device_class(self):
+        """Return the class of this binary_sensor."""
+        return BinarySensorDeviceClass.CONNECTIVITY
+
+    @property
+    def is_on(self):
+        """Return true if the binary_sensor is on."""
+        return self.aparatus_detail.hasDisconnectedNotificationsOn

@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: ha-generac-test
+    volumes:
+      - ./config:/config
+      - ./custom_components:/config/custom_components
+    ports:
+      - "8123:8123"
+    environment:
+      - TZ=UTC

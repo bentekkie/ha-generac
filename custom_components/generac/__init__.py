@@ -16,6 +16,12 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from .api import GeneracApiClient
 from .const import CONF_PASSWORD
 from .const import CONF_USERNAME
+from .const import CONF_COOKIES
+from .const import CONF_AUTH_TOKEN
+from .const import CONF_AUTH_METHOD
+from .const import AUTH_METHOD_USERNAME_PASSWORD
+from .const import AUTH_METHOD_COOKIES
+from .const import AUTH_METHOD_TOKEN
 from .const import DOMAIN
 from .const import PLATFORMS
 from .const import STARTUP_MESSAGE
@@ -32,11 +38,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         hass.data.setdefault(DOMAIN, {})
         _LOGGER.info(STARTUP_MESSAGE)
 
-    username = entry.data.get(CONF_USERNAME, "")
-    password = entry.data.get(CONF_PASSWORD, "")
-
+    auth_method = entry.data.get(CONF_AUTH_METHOD, AUTH_METHOD_USERNAME_PASSWORD)
     session = async_get_clientsession(hass)
-    client = GeneracApiClient(username, password, session)
+    
+    # Create client based on authentication method
+    if auth_method == AUTH_METHOD_TOKEN:
+        auth_token = entry.data.get(CONF_AUTH_TOKEN)
+        client = GeneracApiClient(session=session, auth_token=auth_token)
+    elif auth_method == AUTH_METHOD_COOKIES:
+        cookies = entry.data.get(CONF_COOKIES)
+        client = GeneracApiClient(session=session, cookies=cookies)
+    else:  # username_password
+        username = entry.data.get(CONF_USERNAME, "")
+        password = entry.data.get(CONF_PASSWORD, "")
+        client = GeneracApiClient(username=username, password=password, session=session)
 
     coordinator = GeneracDataUpdateCoordinator(hass, client=client, config_entry=entry)
     await coordinator.async_config_entry_first_refresh()

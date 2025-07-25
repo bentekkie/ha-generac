@@ -50,6 +50,10 @@ def sensors(item: Item) -> list[Type[GeneracEntity]]:
         ModelNumberSensor,
         DeviceSsidSensor,
         PanelIDSensor,
+        ExerciseMinutesSensor,
+        FuelTypeSensor,
+        NetworkTypeSensor,
+        CurrentAlarmSensor,
     ]
     if (
         item.apparatusDetail.weather is not None
@@ -156,10 +160,17 @@ class RunTimeSensor(GeneracEntity, SensorEntity):
         """Return the state of the sensor."""
         if self.aparatus_detail.properties is None:
             return 0
+        # v5 API uses type 71 for Engine Hours, v2 API used type 70
         val = next(
-            (prop.value for prop in self.aparatus_detail.properties if prop.type == 70),
-            0,
+            (prop.value for prop in self.aparatus_detail.properties if prop.type == 71),
+            None,
         )
+        if val is None:
+            # Fallback to v2 API type
+            val = next(
+                (prop.value for prop in self.aparatus_detail.properties if prop.type == 70),
+                0,
+            )
         if isinstance(val, str):
             val = float(val)
         return val
@@ -181,10 +192,17 @@ class ProtectionTimeSensor(GeneracEntity, SensorEntity):
         """Return the state of the sensor."""
         if self.aparatus_detail.properties is None:
             return 0
+        # v5 API uses type 32 for Hours of Protection, v2 API used type 31
         val = next(
-            (prop.value for prop in self.aparatus_detail.properties if prop.type == 31),
-            0,
+            (prop.value for prop in self.aparatus_detail.properties if prop.type == 32),
+            None,
         )
+        if val is None:
+            # Fallback to v2 API type
+            val = next(
+                (prop.value for prop in self.aparatus_detail.properties if prop.type == 31),
+                0,
+            )
         if isinstance(val, str):
             val = float(val)
         return val
@@ -260,10 +278,17 @@ class BatteryVoltageSensor(GeneracEntity, SensorEntity):
         """Return the state of the sensor."""
         if self.aparatus_detail.properties is None:
             return 0
+        # v5 API uses type 70 for Battery Voltage, v2 API used type 69
         val = next(
-            (prop.value for prop in self.aparatus_detail.properties if prop.type == 69),
-            0,
+            (prop.value for prop in self.aparatus_detail.properties if prop.type == 70),
+            None,
         )
+        if val is None:
+            # Fallback to v2 API type
+            val = next(
+                (prop.value for prop in self.aparatus_detail.properties if prop.type == 69),
+                0,
+            )
         if isinstance(val, str):
             val = float(val)
         return val
@@ -421,6 +446,98 @@ class PanelIDSensor(GeneracEntity, SensorEntity):
     def native_value(self):
         """Return the state of the sensor."""
         return self.aparatus.panelId
+
+
+class ExerciseMinutesSensor(GeneracEntity, SensorEntity):
+    """Exercise Minutes sensor from v5 API."""
+
+    _attr_device_class = SensorDeviceClass.DURATION
+    _attr_native_unit_of_measurement = "min"
+
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_exercise_minutes"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if self.aparatus_detail.properties is None:
+            return 0
+        # v5 API type 95 for Exercise Minutes
+        val = next(
+            (prop.value for prop in self.aparatus_detail.properties if prop.type == 95),
+            0,
+        )
+        if isinstance(val, str):
+            val = float(val)
+        return val
+
+
+class FuelTypeSensor(GeneracEntity, SensorEntity):
+    """Fuel Type sensor from v5 API."""
+
+    _attr_options = [
+        "Unknown",
+        "Natural Gas", 
+        "Propane",
+    ]
+    _attr_device_class = SensorDeviceClass.ENUM
+
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_fuel_type"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if self.aparatus_detail.properties is None:
+            return self.options[0]
+        # v5 API type 88 for Fuel Type
+        val = next(
+            (prop.value for prop in self.aparatus_detail.properties if prop.type == 88),
+            "0",
+        )
+        if isinstance(val, str):
+            fuel_type_int = int(val)
+        else:
+            fuel_type_int = val or 0
+            
+        if fuel_type_int == 1:
+            return self.options[1]  # Natural Gas
+        elif fuel_type_int == 2:
+            return self.options[2]  # Propane
+        else:
+            return self.options[0]  # Unknown
+
+
+class NetworkTypeSensor(GeneracEntity, SensorEntity):
+    """Network Type sensor from v5 API."""
+
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_network_type"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        return self.aparatus_detail.networkType
+
+
+class CurrentAlarmSensor(GeneracEntity, SensorEntity):
+    """Current Alarm sensor from v5 API."""
+
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return f"{DEFAULT_NAME}_{self.generator_id}_current_alarm"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        return self.aparatus_detail.currentAlarm
 
 
 # class SignalStrengthSensor(GeneracEntity, SensorEntity):

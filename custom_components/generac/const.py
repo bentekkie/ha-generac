@@ -24,6 +24,14 @@ PLATFORMS = [BINARY_SENSOR, SENSOR, WEATHER, IMAGE]
 CONF_ENABLED = "enabled"
 CONF_USERNAME = "username"
 CONF_PASSWORD = "password"
+CONF_COOKIES = "cookies"
+CONF_AUTH_TOKEN = "auth_token"
+CONF_AUTH_METHOD = "auth_method"
+
+# Authentication methods
+AUTH_METHOD_USERNAME_PASSWORD = "username_password"
+AUTH_METHOD_COOKIES = "cookies"
+AUTH_METHOD_TOKEN = "token"
 
 # Defaults
 DEFAULT_NAME = DOMAIN
